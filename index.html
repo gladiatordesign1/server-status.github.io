@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Server Matching</title>
+    <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+
+
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: white;
+      background-color: #212121;
+    }
+
+    h2 {
+      color: white;
+    }
+
+    h3 {
+      text-align: center;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+
+    textarea,
+    input {
+      width: 100%;
+      /* Adjusted to full width */
+      padding: 8px;
+      margin-bottom: 10px;
+      box-sizing: border-box;
+      border: 1px solid #444;
+      /* Dark border */
+      background-color: #333;
+      /* Dark background */
+      color: white;
+    }
+
+    /* Set the SPF DOMAIN and DOMAIN inputs to be in the same column */
+    #subdomain,
+    #spfdomain {
+      /* Adjusted to full width */
+      box-sizing: border-box;
+      margin-bottom: 10px;
+    }
+
+    /* Center the button */
+    button {
+      padding: 10px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    .pushable {
+      position: relative;
+      background: transparent;
+      margin: 10px;
+      padding: 0px;
+      border: none;
+      cursor: pointer;
+      outline-offset: 4px;
+      outline-color: deeppink;
+      transition: filter 250ms;
+      -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+    }
+
+    .shadow {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 100%;
+      background: hsl(0, 0%, 11%);
+      border-radius: 8px;
+      filter: blur(2px);
+      will-change: transform;
+      transform: translateY(2px);
+      transition: transform 600ms cubic-bezier(0.3, 0.7, 0.4, 1);
+    }
+
+    .edge {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 100%;
+      border-radius: 8px;
+      background: linear-gradient(to right,
+          hsl(210, 64%, 60%) 0%,
+          hsl(210, 100%, 63%) 8%,
+          hsl(210, 64%, 60%) 92%,
+          hsl(210, 64%, 50%) 100%);
+    }
+	
+
+    .front {
+      display: block;
+      position: relative;
+      border-radius: 8px;
+      background: #2196F3;
+      padding: 16px 32px;
+      color: white;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+        Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      font-size: 1rem;
+      transform: translateY(-4px);
+      transition: transform 600ms cubic-bezier(0.3, 0.7, 0.4, 1);
+    }
+
+    .pushable:hover {
+      filter: brightness(110%);
+    }
+
+    .pushable:hover .front {
+      transform: translateY(-6px);
+      transition: transform 250ms cubic-bezier(0.3, 0.7, 0.4, 1.5);
+    }
+
+    .pushable:active .front {
+      transform: translateY(-2px);
+      transition: transform 34ms;
+    }
+
+    .pushable:hover .shadow {
+      transform: translateY(4px);
+      transition: transform 250ms cubic-bezier(0.3, 0.7, 0.4, 1.5);
+    }
+
+    .pushable:active .shadow {
+      transform: translateY(1px);
+      transition: transform 34ms;
+    }
+
+    .pushable:focus:not(:focus-visible) {
+      outline: none;
+    }
+
+    #res {
+      display: none;
+    }
+
+    input,
+    textarea,
+    select {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 10px;
+      box-sizing: border-box;
+      border: 1px #2196F3 solid;
+      border-radius: 4px;
+      background-color: #2c2c2c;
+      color: white;
+    }
+
+    input,
+    textarea,
+    select:active {
+      outline: none;
+    }
+
+    .coolinput {
+      display: flex;
+      flex-direction: column;
+      width: fit-content;
+      position: static;
+      width: 50%;
+    }
+
+    .coolinput label.text {
+      font-size: 0.75rem;
+      color: #2196F3;
+      font-weight: 700;
+      position: relative;
+      top: 0.5rem;
+      margin: 0 0 0 7px;
+      padding: 0 3px;
+      background: #2c2c2c;
+      width: fit-content;
+    }
+
+    .coolinput input[type=text].input {
+      padding: 11px 10px;
+      font-size: 0.75rem;
+      color: white;
+      border: 1px #2196F3 solid;
+      border-radius: 5px;
+      background: #2d2d2d;
+    }
+
+    .coolinput input[type=text].input:focus {
+      outline: none;
+    }
+
+    .coolinput textarea:focus {
+      outline: none;
+    }
+
+    .coolinput textarea {
+      padding: 11px 10px;
+      font-size: 0.75rem;
+      color: white;
+      border: 1px #2196F3 solid;
+      border-radius: 5px;
+      background: #2c2c2c;
+      resize: none;
+      height: 100px;
+    }
+
+
+ #res {
+      opacity: 0;
+    
+    }
+   #res {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 80%;
+      margin: auto; /* Center the #res div on the screen */
+      margin-top: 20px; /* Add some top margin for space */
+    }
+
+    #matchedTextArea,
+    #notMatchedTextArea {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 11px 10px;
+      font-size: 0.75rem;
+      color: white;
+      border: 1px solid;
+      border-radius: 5px;
+      background: #2c2c2c;
+      resize: none;
+      height: 100px;
+      margin-bottom: 10px; /* Add some bottom margin for space */
+    }
+
+    #matchedTextArea {
+      color: #3c763d;
+      background-color: #dff0d8;
+      border-color: #d6e9c6;
+    }
+
+    #notMatchedTextArea {
+      color: #a94442;
+      background-color: #f2dede;
+      border-color: #a94442;
+    }
+	    #res >div {
+     padding-left: 50px;
+     
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="coolinput">
+    <label for="serverInput" class="text">Enter Server ID and Domains:</label>
+    <textarea id="serverInput" rows="4" placeholder="abs2266 To-Keep hostmaster@tradications.bid kongja.grimmation.jp.net 195.154.39.145 &#10;
+abs2266	To-Keep	hostmaster@tradications.bid grimmation.jp.net 195.154.39.123 &#10;
+abs2266	To-Keep	hostmaster@tradications.bid formistances.jp.net	195.154.32.212 &#10;
+" name="input" class="input"></textarea>
+  </div>
+
+
+  <button onclick="checkServers()" class="pushable">
+    <span class="shadow"></span>
+    <span class="edge"></span>
+    <span class="front">
+      MATCH
+    </span>
+  </button>
+
+  
+
+
+
+
+  <div id="res">
+    <div class="coolinput">
+      <label for="matchedTextArea" class="text">Matched Servers:</label>
+      <textarea id="matchedTextArea" rows="4" name="input" class="input" readonly></textarea>
+    </div>
+    <div class="coolinput">
+      <label for="notMatchedTextArea" class="text">Not Matched Servers:</label>
+      <textarea id="notMatchedTextArea" rows="4" name="input" class="input" readonly></textarea>
+    </div>
+  </div>
+
+
+  <script>
+    function checkServers() {
+
+      const input = document.getElementById('serverInput').value;
+
+      const servers = input.split('\n');
+
+      const uniqueMatchedServers = new Set();
+      const uniqueNotMatchedServers = new Set();
+
+      servers.forEach(server => {
+        const serverInfo = server.split('\t');
+        const serverId = serverInfo[0];
+
+        if (serverInfo.length >= 9) {
+          const domain1 = serverInfo[3]; 
+          const domain2 = serverInfo[8];
+
+          if (domain1 === domain2 && domain2 !== "") {
+            uniqueMatchedServers.add(serverId);
+          } else {
+            uniqueNotMatchedServers.add(serverId);
+          }
+        }
+      });
+      document.getElementById('res').style.opacity = "1";
+
+      // Display results
+      displayResults(uniqueMatchedServers, uniqueNotMatchedServers);
+
+    }
+
+    function displayResults(matched, notMatched) {
+      const matchedTextArea = document.getElementById('matchedTextArea');
+      const notMatchedTextArea = document.getElementById('notMatchedTextArea');
+
+      matchedTextArea.value = [...matched].join('\n');
+      notMatchedTextArea.value = [...notMatched].join('\n');
+
+      
+    }
+  </script>
+
+
+</body>
+
+</html>
