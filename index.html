@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Server Matching</title>
     <style>
-    body {
+     body {
       font-family: Arial, sans-serif;
     }
 
@@ -38,20 +38,26 @@
     textarea,
     input {
       width: 100%;
+      /* Adjusted to full width */
       padding: 8px;
       margin-bottom: 10px;
       box-sizing: border-box;
       border: 1px solid #444;
+      /* Dark border */
       background-color: #333;
+      /* Dark background */
       color: white;
     }
 
+    /* Set the SPF DOMAIN and DOMAIN inputs to be in the same column */
     #subdomain,
     #spfdomain {
+      /* Adjusted to full width */
       box-sizing: border-box;
       margin-bottom: 10px;
     }
 
+    /* Center the button */
     button {
       padding: 10px;
       background-color: #4CAF50;
@@ -184,7 +190,7 @@
 
     .coolinput label.text {
       font-size: 0.75rem;
-      color: #2196F3;
+      color: #ffffff;
       font-weight: 700;
       position: relative;
       top: 0.5rem;
@@ -232,8 +238,8 @@
       justify-content: space-between;
       align-items: center;
       width: 80%;
-      margin: auto;
-      margin-top: 20px; 
+      margin: auto; /* Center the #res div on the screen */
+      margin-top: 20px; /* Add some top margin for space */
     }
 
     #matchedTextArea,
@@ -248,7 +254,7 @@
       background: #2c2c2c;
       resize: none;
       height: 100px;
-      margin-bottom: 10px; 
+      margin-bottom: 10px; /* Add some bottom margin for space */
     }
 
     #matchedTextArea {
@@ -262,92 +268,100 @@
       background-color: #f2dede;
       border-color: #a94442;
     }
+    #downServersTextArea {
+      color: #b77a00;
+      background-color: #ffc44d;
+      border-color: #f2b900;
+    }
 	    #res >div {
      padding-left: 50px;
      
     }
-  </style>
+    </style>
 </head>
 
 <body>
 
-  <div class="coolinput">
-    <label for="serverInput" class="text">Enter Server ID and Domains:</label>
-    <textarea id="serverInput" rows="4" placeholder="abs2266 To-Keep hostmaster@tradications.bid kongja.grimmation.jp.net 195.154.39.145 &#10;
+    <div class="coolinput">
+        <label for="serverInput" class="text">Enter Server ID and Domains:</label>
+        <textarea id="serverInput" rows="4" placeholder="abs2266 To-Keep hostmaster@tradications.bid kongja.grimmation.jp.net 195.154.39.145 &#10;
 abs2266	To-Keep	hostmaster@tradications.bid grimmation.jp.net 195.154.39.123 &#10;
 abs2266	To-Keep	hostmaster@tradications.bid formistances.jp.net	195.154.32.212 &#10;
 " name="input" class="input"></textarea>
-  </div>
-
-
-  <button onclick="checkServers()" class="pushable">
-    <span class="shadow"></span>
-    <span class="edge"></span>
-    <span class="front">
-      MATCH
-    </span>
-  </button>
-
-  
-
-
-
-
-  <div id="res">
-    <div class="coolinput">
-      <label for="matchedTextArea" class="text">Matched Servers:</label>
-      <textarea id="matchedTextArea" rows="4" name="input" class="input" readonly></textarea>
     </div>
-    <div class="coolinput">
-      <label for="notMatchedTextArea" class="text">Not Matched Servers:</label>
-      <textarea id="notMatchedTextArea" rows="4" name="input" class="input" readonly></textarea>
+
+    <button onclick="checkServers()" class="pushable">
+        <span class="shadow"></span>
+        <span class="edge"></span>
+        <span class="front">
+            MATCH
+        </span>
+    </button>
+
+    <div id="res">
+        <div class="coolinput">
+            <label for="matchedTextArea" class="text">Matched Servers:</label>
+            <textarea id="matchedTextArea" rows="4" name="input" class="input" readonly></textarea>
+        </div>
+        <div class="coolinput">
+            <label for="notMatchedTextArea" class="text">Not Matched Servers:</label>
+            <textarea id="notMatchedTextArea" rows="4" name="input" class="input" readonly></textarea>
+        </div>
+        <div class="coolinput">
+            <label for="downServersTextArea" class="text">Down Servers:</label>
+            <textarea id="downServersTextArea" rows="4" name="input" class="input" readonly></textarea>
+        </div>
     </div>
-  </div>
 
+    <script>
+        function checkServers() {
 
-  <script>
-    function checkServers() {
+            const input = document.getElementById('serverInput').value;
 
-      const input = document.getElementById('serverInput').value;
+            const servers = input.split('\n');
 
-      const servers = input.split('\n');
+            const uniqueMatchedServers = new Set();
+            const uniqueNotMatchedServers = new Set();
+            const uniqueDownServers = new Set();
 
-      const uniqueMatchedServers = new Set();
-      const uniqueNotMatchedServers = new Set();
+            servers.forEach(server => {
+                const serverInfo = server.split('\t');
+                const serverId = serverInfo[0];
+                const status = serverInfo[1];
 
-      servers.forEach(server => {
-        const serverInfo = server.split('\t');
-        const serverId = serverInfo[0];
+                if (serverInfo.length >= 9) {
+                    const domain1 = serverInfo[3];
+                    const domain2 = serverInfo[8];
 
-        if (serverInfo.length >= 9) {
-          const domain1 = serverInfo[3]; 
-          const domain2 = serverInfo[8];
+                    if (domain1 === domain2 && domain2 !== "") {
+                        uniqueMatchedServers.add(serverId);
+                    } else {
+                        uniqueNotMatchedServers.add(serverId);
+                    }
 
-          if (domain1 === domain2 && domain2 !== "") {
-            uniqueMatchedServers.add(serverId);
-          } else {
-            uniqueNotMatchedServers.add(serverId);
-          }
+                }
+
+                if (status && status.toLowerCase() === "down") {
+                    uniqueDownServers.add(serverId);
+                }
+            });
+            document.getElementById('res').style.opacity = "1";
+
+            // Display results
+            displayResults(uniqueMatchedServers, uniqueNotMatchedServers, uniqueDownServers);
+
         }
-      });
-      document.getElementById('res').style.opacity = "1";
 
-      // Display results
-      displayResults(uniqueMatchedServers, uniqueNotMatchedServers);
+        function displayResults(matched, notMatched, downServers) {
+            const matchedTextArea = document.getElementById('matchedTextArea');
+            const notMatchedTextArea = document.getElementById('notMatchedTextArea');
+            const downServersTextArea = document.getElementById('downServersTextArea');
 
-    }
-
-    function displayResults(matched, notMatched) {
-      const matchedTextArea = document.getElementById('matchedTextArea');
-      const notMatchedTextArea = document.getElementById('notMatchedTextArea');
-
-      matchedTextArea.value = [...matched].join('\n');
-      notMatchedTextArea.value = [...notMatched].join('\n');
-
-      
-    }
-  </script>
-
+            matchedTextArea.value = [...matched].join('\n');
+            notMatchedTextArea.value = [...notMatched].join('\n');
+            downServersTextArea.value = [...downServers].join('\n');
+        }
+    </script>
 
 </body>
 
